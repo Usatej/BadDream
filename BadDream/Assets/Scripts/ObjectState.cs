@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class ObjectState
+public abstract class ObjectState
 {
 
     protected PhaseController player;
@@ -13,23 +13,11 @@ public class ObjectState
         player = _player;
     }
 
-    public virtual void Enter()
-    {
+    public abstract void Enter();
 
-    }
+    public abstract void EarlyUpdate();
 
-    public virtual ObjectState EarlyUpdate()
-    {
-        return new ObjectState(player);
-    }
+    public abstract void HandleInput();
 
-    public virtual ObjectState HandleInput()
-    {
-        return new ObjectState(player);
-    }
-
-    public virtual ObjectState Update()
-    {
-        return new ObjectState(player);
-    }
+    public abstract void Update();
 }

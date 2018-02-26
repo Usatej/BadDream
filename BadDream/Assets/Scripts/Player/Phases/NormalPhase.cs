@@ -4,19 +4,32 @@ using UnityEngine;
 
 public class NormalPhase : Phase
 {
+    private TouchManager touchManager;
+
+
     public NormalPhase(PhaseController _player) : base(_player)
     {
+        
+        touchManager = player.touchManager;
         Enter();
         CreateState(PlayerStates.Move);
     }
 
     public override void Enter()
     {
-        base.Enter();
+
     }
 
-    public override void Update()
+    private void HandleInput()
     {
-        base.Update();
+        if((touchManager.AreaTap || Input.GetKeyDown(KeyCode.K)) && !player.inAction && player.actualAction != null)
+        {
+            CreateState(PlayerStates.Action);
+        }
+    }
+
+    protected override void EarlyUpdate()
+    {
+        HandleInput();
     }
 }

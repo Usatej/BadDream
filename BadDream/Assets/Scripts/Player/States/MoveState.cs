@@ -29,10 +29,10 @@ public class MoveState : ObjectState
 
     public override void Enter()
     {
-        base.Enter();
+
     }
 
-    public override ObjectState EarlyUpdate()
+    public override void EarlyUpdate()
     {
         if (!player.grounder.IsGrounded())
         {
@@ -46,17 +46,15 @@ public class MoveState : ObjectState
             anim.SetBool("grounded", true);
             doubleJumped = jumped = false;
         }
-        return null;
     }
 
-    public override ObjectState HandleInput()
+    public override void HandleInput()
     {
 
         //Movement Horizontal
         if(joystick.IsThereInput())
         {
             float x = joystick.Input.x;
-            Debug.Log(x);
             if(x > 0)
             {
                 player.transform.localScale = new Vector3(1, 1, 1);
@@ -79,20 +77,16 @@ public class MoveState : ObjectState
             {
                 rb.velocity = new Vector2(rb.velocity.x, attr.jumpForce);
                 jumped = true;
-                Debug.Log("Jump");
             } else if(inAir && !doubleJumped)
             {
                 rb.velocity = new Vector2(rb.velocity.x, attr.jumpForce * attr.doubleJumpMultiplier);
                 doubleJumped = true;
-                Debug.Log("DoubleJump");
             }
         }
-
-        return null;
     }
 
-    public override ObjectState Update()
+    public override void Update()
     {
-        return null;
+        
     }
 }

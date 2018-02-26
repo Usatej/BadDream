@@ -37,6 +37,11 @@ public class PhaseController : MonoBehaviour
     [Header("Player attributes")]
     public Attributes moveAttributes;
 
+    [HideInInspector]
+    public ObjectAction actualAction = null;
+    [HideInInspector]
+    public bool inAction = false;
+
 
     void Start()
     {
