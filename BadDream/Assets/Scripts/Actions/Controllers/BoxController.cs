@@ -5,14 +5,38 @@ using UnityEngine;
 public class BoxController : MonoBehaviour {
 
     bool isHere = false;
+    PhaseController pc;
 
-    private void OnTriggerEnter2D(Collider2D coll)
+    private void Start()
     {
-        if(!isHere && coll.tag == "Player")
+        pc = GameObject.Find("Player").GetComponent<PhaseController>();
+    }
+
+    private void OnTriggerStay2D(Collider2D coll)
+    {
+        
+        if (!isHere && coll.tag == "Hands" && pc.actualAction == null)
         {
-            isHere = true;
-            coll.GetComponent<PhaseController>().actualAction = new BoxAction(this.gameObject, coll.gameObject);
-            Debug.Log("LOL");
+                float xBox = transform.position.x;
+                float xPl = coll.transform.root.position.x;
+                if (Mathf.Sign(coll.transform.root.localScale.x) > 0)
+                {
+                    if (xBox > xPl)
+                    {
+                        isHere = true;
+                    Debug.Log("LoL");
+                       pc.viableAction = new BoxAction(this.gameObject, coll.transform.root.gameObject);
+                    }
+                }
+                else
+                {
+                    if (xPl > xBox)
+                    {
+                    Debug.Log("LoL2");
+                    isHere = true;
+                        pc.viableAction = new BoxAction(this.gameObject, coll.transform.root.gameObject);
+                    }
+                }
         }
     }
 
@@ -20,9 +44,8 @@ public class BoxController : MonoBehaviour {
     {
         if (isHere && coll.tag == "Player")
         {
-        //    isHere = false;
-        //    coll.GetComponent<PhaseController>().actualAction = null;
-            //Debug.Log("DONE");
+            isHere = false;
+            pc.viableAction = null;
         }
     } 
 }

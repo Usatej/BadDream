@@ -4,15 +4,25 @@ using UnityEngine;
 
 public class ActionState : ObjectState
 {
-    public ActionState(PhaseController _player): base(_player)
+
+    private bool left = false;
+
+    public ActionState(PhaseController _player) : base(_player)
     {
+        player.actualAction = player.viableAction;
         Enter();
     }
 
     public override void Enter()
     {
-        if (!player.actualAction.CanEnter()) player.actualPhase.SendRequestToCreateState(PlayerStates.Move);
-        else player.actualAction.Enter();
+        if (!player.actualAction.CanEnter())
+        {
+            Leave();
+        }
+        else
+        {
+            player.actualAction.Enter();
+        }
     }
 
     public override void EarlyUpdate()
@@ -22,11 +32,18 @@ public class ActionState : ObjectState
 
     public override void HandleInput()
     {
-        player.actualAction.HandleInput();
+        if (!left && !player.actualAction.HandleInput()) Leave();
     }
 
     public override void Update()
     {
-        player.actualAction.Update();
+        if (!left && !player.actualAction.Update()) Leave();
+    }
+
+    private void Leave()
+    {
+        player.actualPhase.SendRequestToCreateState(PlayerStates.Move);
+        left = true;
+        player.actualAction = null;
     }
 }

@@ -21,7 +21,7 @@ public class MoveState : ObjectState
         anim = player.GetComponent<Animator>();
         rb = player.GetComponent<Rigidbody2D>();
 
-        attr = player.moveAttributes;
+        attr = player.attributes;
         touchManager = player.touchManager;
         joystick = player.joystick;
         Enter();
@@ -29,7 +29,6 @@ public class MoveState : ObjectState
 
     public override void Enter()
     {
-
     }
 
     public override void EarlyUpdate()
@@ -42,7 +41,7 @@ public class MoveState : ObjectState
         }
         else
         {
-            rb.velocity = new Vector2(rb.velocity.x * attr.friction, rb.velocity.y);
+         //   rb.velocity = new Vector2(rb.velocity.x * attr.friction, rb.velocity.y);
             anim.SetBool("grounded", true);
             doubleJumped = jumped = false;
         }
@@ -58,10 +57,10 @@ public class MoveState : ObjectState
             if(x > 0)
             {
                 player.transform.localScale = new Vector3(1, 1, 1);
-                rb.velocity = new Vector2(attr.moveSpeed * x * Time.deltaTime, rb.velocity.y);
+                rb.velocity = new Vector2(attr.moveSpeed * x, rb.velocity.y);
             } else if (x < 0) {
                 player.transform.localScale = new Vector3(-1, 1, 1);
-                rb.velocity = new Vector2(attr.moveSpeed * x * Time.deltaTime, rb.velocity.y);
+                rb.velocity = new Vector2(attr.moveSpeed * x, rb.velocity.y);
             }
             anim.SetFloat("speed", Mathf.Abs(x));
         } else

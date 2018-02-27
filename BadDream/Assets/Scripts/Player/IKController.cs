@@ -11,7 +11,6 @@ public class IKController : MonoBehaviour {
         public Transform ik;
         public Transform centerPoint;
         public float maxDistance;
-        public float offSet;
     }
 
     public IKInfo leftArmPull;

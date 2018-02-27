@@ -22,7 +22,7 @@ public class NormalPhase : Phase
 
     private void HandleInput()
     {
-        if((touchManager.AreaTap || Input.GetKeyDown(KeyCode.K)) && !player.inAction && player.actualAction != null)
+        if((touchManager.AreaTap || Input.GetKeyDown(KeyCode.K)) && !player.inAction && player.viableAction != null)
         {
             CreateState(PlayerStates.Action);
         }

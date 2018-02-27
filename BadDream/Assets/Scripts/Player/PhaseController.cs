@@ -3,22 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-[System.Serializable]
-public class Attributes
-{
-    public float moveSpeed = 250;
-    public float friction = 0.8f;
-    
-    [Range(1,10)]
-    public float jumpForce = 10;
-    [Range(0, 1)]
-    public float doubleJumpMultiplier = 0.6f;
-    public float pushPower = 150;
-
-}
-
-
-
 public class PhaseController : MonoBehaviour
 {
     [Header("Inputs")]
@@ -33,10 +17,13 @@ public class PhaseController : MonoBehaviour
 
     [HideInInspector]
     public Phase actualPhase;
+    
 
     [Header("Player attributes")]
-    public Attributes moveAttributes;
+    public Attributes attributes;
 
+    [HideInInspector]
+    public ObjectAction viableAction;
     [HideInInspector]
     public ObjectAction actualAction = null;
     [HideInInspector]

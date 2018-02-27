@@ -4,27 +4,33 @@ using UnityEngine;
 
 public class BoxAction : ObjectAction
 {
-
-    public struct IntersectPoint {
-        public Vector2 point;
-        public float k;
-    }
-
     private GameObject bigBox;
     private DistanceJoint2D dJoint;
     private IKController iks;
 
-    private float minHandPos,maxHandPos;
-    private float bottomHolder, topHolder;
+    private float distanceFromBox = 0.75f; 
 
-    private float distanceFromBox = 0.75f;
-        
+    private bool firstLoopWait = true;
 
     private SpriteRenderer handArea;
 
+    private GameObject p1, p2, cen;
+
+    private VirtualJoystick joystick;
+    private Rigidbody2D rb;
+    private Rigidbody2D bigBoxRb;
+    private DistanceJoint2D dj;
+    private Attributes attrs;
+
+    private Animator anim;
+
+    private float pushDistance = 0.2f;
+    private float pullDistance = 0.5f;
+
+    private Grounder grounder;
+
     public BoxAction(GameObject obj, GameObject pl): base(obj,pl)
     {
-        
     }
 
     public override bool CanEnter()
@@ -37,33 +43,72 @@ public class BoxAction : ObjectAction
 
     public override bool Enter()
     {
+        firstLoopWait = true;
         bigBox = actionObject.transform.parent.gameObject;
         iks = player.GetComponent<IKController>();
         handArea = actionObject.GetComponent<SpriteRenderer>();
-        player.GetComponent<Animator>().Play("Push");
-        player.transform.position = new Vector3(actionObject.transform.position.x - distanceFromBox, player.transform.position.y, 0);
+        PhaseController pc = player.GetComponent<PhaseController>();
+        joystick = pc.joystick;
+        attrs = pc.attributes;
+        grounder = pc.grounder;
+        rb = player.GetComponent<Rigidbody2D>();
+        bigBoxRb = bigBox.GetComponent<Rigidbody2D>();
+        anim = player.GetComponent<Animator>();
+        distanceFromBox = (player.transform.localScale.x > 0) ? -distanceFromBox : distanceFromBox;
+        player.transform.position = new Vector3(actionObject.transform.position.x + distanceFromBox, player.transform.position.y, 0);
         iks.leftArmPull.ik.transform.gameObject.SetActive(true);
         iks.rightArmPull.ik.transform.gameObject.SetActive(true);
+        anim.SetBool("pulling", true);
+        CreateJoint();
         return true;
     }
 
     public override bool HandleInput()
     {
+        if(joystick.IsThereInput() && grounder.IsGrounded())
+        {
+            float y = joystick.Input.y;
+            y = (y < 0) ? y*attrs.pushSpeed : -5f + rb.velocity.y;
+            rb.velocity = new Vector2(joystick.Input.x * attrs.pushSpeed, y);
+        }
         if(Input.GetKeyDown(KeyCode.O))
         {
-            Bounds bd = handArea.bounds;
-            Vector2 x = CalculatePoints(bd.center.x, bd.max.y, bd.center.x, bd.center.y, actionObject.transform.eulerAngles.z);
-            Vector2 y = CalculatePoints(bd.center.x, bd.min.y, bd.center.x, bd.center.y, actionObject.transform.eulerAngles.z);
-            Vector2 tmp = new Vector2(iks.rightArmPull.centerPoint.transform.position.x, iks.rightArmPull.centerPoint.transform.position.y);
-            List<IntersectPoint> points = CalculateIntersectPoints(x, y, tmp, iks.rightArmPull.maxDistance);
-            HandsIKPosition(points, x, y);
+            StopHolding();
+            return false;
         }
         return true;
     }
 
     public override bool Update()
     {
-        
+        if (firstLoopWait)
+        {
+            firstLoopWait = false;
+            return true;
+        }
+
+        dj.enabled = false;
+
+        if (Mathf.Abs(bigBoxRb.velocity.x) > 1.5)
+        {
+            bigBoxRb.velocity = new Vector2(1.5f * Mathf.Sign(bigBoxRb.velocity.x),bigBoxRb.velocity.y);
+        }
+        if(!joystick.IsThereInput()) rb.velocity = new Vector2(rb.velocity.x * attrs.friction , rb.velocity.y);
+        anim.SetFloat("speed", (-player.transform.localScale.x) * joystick.Input.x);
+//        if(joystick.Input.)
+
+
+        Bounds bd = handArea.bounds;
+        Vector2 x = CalculatePoints(bd.center.x, bd.max.y, bd.center.x, bd.center.y, actionObject.transform.eulerAngles.z);
+        Vector2 y = CalculatePoints(bd.center.x, bd.min.y, bd.center.x, bd.center.y, actionObject.transform.eulerAngles.z);
+        Vector2 tmp = new Vector2(iks.rightArmPull.centerPoint.transform.position.x, iks.rightArmPull.centerPoint.transform.position.y);
+        List<IntersectPoint> points = CalculateIntersectPoints(x, y, tmp, iks.rightArmPull.maxDistance);
+        dj.connectedAnchor = player.transform.InverseTransformPoint(iks.rightArmPull.centerPoint.transform.position);
+        HandsIKPosition(points, x, y);
+
+
+
+        dj.enabled = true;
         return true;
     }
 
@@ -97,7 +142,9 @@ public class BoxAction : ObjectAction
         //Determinant
         float d = b * b - 4 * a * c;
 
-        if (d < 0) return intersectPoints;
+        if (d < 0) {
+            return intersectPoints;
+        }
         if (d == 0)
         {
             float k = -b / (2 * a);
@@ -122,29 +169,100 @@ public class BoxAction : ObjectAction
 
     private bool HandsIKPosition(List<IntersectPoint> inPoints, Vector2 topP, Vector2 botP)
     {
-        if (inPoints.Count == 0) return false;
+        Vector3 anchors = Vector3.zero;
+        if (inPoints.Count == 0)
+        {
+            return false;
+        }
         if (inPoints.Count == 1 && PointIsBetweenPoints(botP, topP, inPoints[0].point))
         {
-            iks.rightArmPull.ik.transform.position = iks.leftArmPull.ik.transform.position = inPoints[0].point - new Vector2(iks.rightArmPull.offSet, 0);
+            anchors = iks.rightArmPull.ik.transform.position = iks.leftArmPull.ik.transform.position = inPoints[0].point;
             return true;
         }
         if (inPoints.Count == 2)
         {
-            if(PointIsBetweenPoints(botP, topP, inPoints[0].point) && PointIsBetweenPoints(botP, topP, inPoints[1].point))
+            bool first = PointIsBetweenPoints(botP, topP, inPoints[0].point);
+            bool second = PointIsBetweenPoints(botP, topP, inPoints[1].point);
+            if (first && second)
             {
-                Vector2 holderMid = (botP + topP) / 2;
                 Vector2 handsMid = (inPoints[0].point + inPoints[1].point) / 2;
-                iks.rightArmPull.ik.transform.position = iks.leftArmPull.ik.transform.position = ((holderMid + handsMid) / 2) - new Vector2(iks.rightArmPull.offSet,0);
+                Vector2 holderMid = (botP + topP) / 2;
+                Vector2 handsPos = (handsMid + holderMid)/ 2;
+                if (PointIsBetweenPoints(inPoints[0].point, inPoints[1].point, handsPos))
+                {
+                    anchors = iks.rightArmPull.ik.transform.position = iks.leftArmPull.ik.transform.position = handsPos;
+                }
+                else
+                {
+                    anchors = iks.rightArmPull.ik.transform.position = iks.leftArmPull.ik.transform.position = GetClosestPoint(inPoints[0].point, inPoints[1].point, handsPos);
+                }
+            }
+            else if (first && !second)
+            {
+                Vector2 n = GetClosestPoint(botP, topP, inPoints[1].point);
+                Vector2 holderMid = (inPoints[0].point + n) / 2;
+                anchors = iks.rightArmPull.ik.transform.position = iks.leftArmPull.ik.transform.position = holderMid;
+
+            }
+            else if (!first && second)
+            {
+                Vector2 n = GetClosestPoint(botP, topP, inPoints[0].point);
+                Vector2 holderMid = (inPoints[1].point + n) / 2;
+                anchors = iks.rightArmPull.ik.transform.position = iks.leftArmPull.ik.transform.position = holderMid;
+            } else if(PointIsBetweenPoints(inPoints[0].point,inPoints[1].point,topP) && PointIsBetweenPoints(inPoints[0].point, inPoints[1].point, botP)) {
+                Vector2 handsMid = (inPoints[0].point + inPoints[1].point) / 2;
+                Vector2 holderMid = (botP + topP) / 2;
+                Vector2 handsPos = (handsMid + holderMid) / 2;
+                if (PointIsBetweenPoints(topP, botP, handsPos))
+                {
+                    anchors = iks.rightArmPull.ik.transform.position = iks.leftArmPull.ik.transform.position = handsPos;
+                }
+                else
+                {
+                    anchors = iks.rightArmPull.ik.transform.position = iks.leftArmPull.ik.transform.position = GetClosestPoint(topP,botP, handsPos);
+                }
+            }
+            else {
+                return false;
             }
         }
+        anchors = dj.transform.InverseTransformPoint(anchors);
+        dj.anchor = new Vector2(anchors.x,anchors.y);
         return true;
     }
 
-    private bool PointIsBetweenPoints(Vector2 point, Vector2 a, Vector2 b)
+    private bool PointIsBetweenPoints(Vector2 a, Vector2 b, Vector2 p)
     {
-        float dist1 = (point - a).magnitude;
-        float dist2 = (point - b).magnitude;
-        float dist = (a - b).magnitude;
-        return ((dist - dist1 + dist2) < 0.0000001f);
+        float distA = (p - a).magnitude;
+        float distB = (p - b).magnitude;
+        float dist = (b - a).magnitude;
+        return (Mathf.Abs(dist - distA - distB) < 0.01);
+    }
+
+    private Vector2 GetClosestPoint(Vector2 a, Vector2 b, Vector2 p)
+    {
+        float distA = (p.x - a.x) * (p.x - a.x) + (p.y - a.y) * (p.y - a.y);
+        float distB = (p.x - b.x) * (p.x - b.x) + (p.y - b.y) * (p.y - b.y);
+        if (distA <= distB) return a;
+        else return b;
+    }
+
+    private void CreateJoint()
+    {
+        dj = bigBox.AddComponent<DistanceJoint2D>();
+        dj.enabled = false;
+        dj.maxDistanceOnly = true;
+        dj.enableCollision = true;
+        dj.autoConfigureDistance = false;
+        dj.connectedBody = rb;
+        dj.distance = 0.5f;
+    }
+
+    private void StopHolding()
+    {
+        player.GetComponent<Animator>().SetBool("pulling", false);
+        iks.leftArmPull.ik.gameObject.SetActive(false);
+        iks.rightArmPull.ik.gameObject.SetActive(false);
+        GameObject.Destroy(dj);
     }
 }
