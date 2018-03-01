@@ -255,7 +255,7 @@ public class BoxAction : ObjectAction
         dj.enableCollision = true;
         dj.autoConfigureDistance = false;
         dj.connectedBody = rb;
-        dj.distance = 0.5f;
+        dj.distance = 0.8f;
     }
 
     private void StopHolding()

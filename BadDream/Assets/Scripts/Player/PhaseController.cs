@@ -22,6 +22,10 @@ public class PhaseController : MonoBehaviour
     [Header("Player attributes")]
     public Attributes attributes;
 
+    [Header("Layers options")]
+
+    public LayerMask boxLayer;
+
     [HideInInspector]
     public ObjectAction viableAction;
     [HideInInspector]

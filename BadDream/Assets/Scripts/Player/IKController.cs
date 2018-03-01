@@ -15,4 +15,6 @@ public class IKController : MonoBehaviour {
 
     public IKInfo leftArmPull;
     public IKInfo rightArmPull;
+    public IKInfo leftLeg;
+    public IKInfo rightLeg;
 }
