@@ -27,4 +27,6 @@ public abstract class HangObject {
     abstract public void HandleInput();
 
     abstract public void Update();
+
+    abstract public void FixedUpdate();
 }

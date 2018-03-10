@@ -26,7 +26,7 @@ abstract public class Phase
 
     protected virtual void EarlyUpdate()
     {
-
+        
     }
 
     protected virtual void LateUpdate()
@@ -34,8 +34,13 @@ abstract public class Phase
 
     }
 
+    public virtual void FixedUpdate()
+    {
+        actualState.FixedUpdate();
+    }
 
-    public void Update()
+
+    public virtual void Update()
     {
         EarlyUpdate();
         actualState.EarlyUpdate();

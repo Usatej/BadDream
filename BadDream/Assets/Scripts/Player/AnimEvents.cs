@@ -23,7 +23,7 @@ public class AnimEvents : MonoBehaviour {
     public void LeaveRootMotion()
     {
         reset = true;
-        rb.isKinematic = false;
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         pc.actualPhase.SendRequestToCreateState(PlayerStates.Move);
     }
 

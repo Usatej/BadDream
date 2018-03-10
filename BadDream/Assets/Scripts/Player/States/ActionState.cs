@@ -58,4 +58,9 @@ public class ActionState : ObjectState
         left = true;
         player.actualAction = null;
     }
+
+    public override void FixedUpdate()
+    {
+
+    }
 }

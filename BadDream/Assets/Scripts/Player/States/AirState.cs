@@ -78,4 +78,8 @@ public class AirState : ObjectState
             }
         }
     }
+
+    public override void FixedUpdate()
+    {
+    }
 }

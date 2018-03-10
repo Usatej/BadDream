@@ -15,16 +15,23 @@ public class Ledge : HangObject
     private Rigidbody2D rbP;
     private DistanceJoint2D dj;
 
+    private Vector2 pos;
+    private Vector3 startPos;
+    private float lerpStartTime;
+    private float lerpCompleteTime = 0.5f;
+    private bool climbing = false;
+
     public Ledge(GameObject obj, GameObject pl): base(obj,pl)
     {
         layer = ~((1 << 9) | (1 << 12));
+        pos = new Vector2(hangPoint.transform.position.x - 0.3f, hangPoint.transform.position.y - 0.85f);
     }
 
     public override void Enter()
     {
         anim = player.GetComponent<Animator>();
         rbP = player.GetComponent<Rigidbody2D>();
-        anim.SetBool("hanged", true);
+        anim.SetBool("hanging", true);
 
         iks = player.GetComponent<IKController>();
         iks.leftArm.ik.gameObject.SetActive(true);
@@ -47,20 +54,41 @@ public class Ledge : HangObject
         {
             LeaveLedge();
             player.actualPhase.SendRequestToCreateState(PlayerStates.Air);
+            anim.SetBool("hanging", false);
         }
         if (player.touchManager.AreaSwipeUp || Input.GetKeyDown(KeyCode.W))
         {
+            climbing = true;
+            startPos = player.transform.position;
+            lerpStartTime = Time.time;
             LeaveLedge();
-            rbP.isKinematic = true;
-            anim.SetBool("climb",true);
+            rbP.constraints = RigidbodyConstraints2D.FreezeAll;
             anim.Play("ClimbUp_LongHang");
+            anim.SetBool("hanging", false);
+        }
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            climbing = true;
         }
     }
 
     public override void Update()
     {
         iks.leftArm.ik.transform.position = iks.rightArm.ik.transform.position = hangPoint.transform.position;
+        
     }
+
+    public override void FixedUpdate()
+    {
+        if (climbing)
+        {
+            float lerpT = Time.time - lerpStartTime;
+            float percentageComplete = lerpT / lerpCompleteTime;
+            player.transform.position = Vector3.Lerp(startPos, pos, percentageComplete);
+            if (percentageComplete >= 1f) climbing = false;
+        }
+    }
+
 
     public override bool Validate()
     {
@@ -87,9 +115,6 @@ public class Ledge : HangObject
     {
         GameObject.Destroy(dj);
         GameObject.Destroy(rbHang);
-      //  iks.leftArm.ik.gameObject.SetActive(false);
-     //   iks.rightArm.ik.gameObject.SetActive(false);
-        //anim.SetBool("hanged", false);
     }
 
     private void DrawBoxCast(Vector2 origin, Vector2 size, Color color)
@@ -103,4 +128,6 @@ public class Ledge : HangObject
         Debug.DrawLine(upRight, upLeft, color);
         Debug.DrawLine(upLeft, downLeft, color);
     }
+
+    
 }

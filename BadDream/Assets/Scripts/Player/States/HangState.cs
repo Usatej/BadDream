@@ -22,6 +22,11 @@ public class HangState : ObjectState
         player.actualHang.Enter();
     }
 
+    public override void FixedUpdate()
+    {
+        player.actualHang.FixedUpdate();
+    }
+
     public override void HandleInput()
     {
         player.actualHang.HandleInput();

@@ -80,6 +80,15 @@ public class MoveState : ObjectState
                 player.actualPhase.SendRequestToCreateState(PlayerStates.Air);
             }
         }
+
+        if ((touchManager.AreaSwipeDown || Input.GetKeyDown(KeyCode.S)))
+        {
+            if (player.grounder.IsGrounded())
+            {
+                rb.velocity = new Vector2(rb.velocity.x, player.attributes.jumpForce);
+                player.actualPhase.SendRequestToCreateState(PlayerStates.Air);
+            }
+        }
     }
 
     public override void Update()
@@ -113,5 +122,9 @@ public class MoveState : ObjectState
         }
         pos = Vector2.zero;
         return false;
+    }
+
+    public override void FixedUpdate()
+    {
     }
 }

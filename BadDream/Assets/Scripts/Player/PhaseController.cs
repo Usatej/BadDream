@@ -47,6 +47,11 @@ public class PhaseController : MonoBehaviour
         viableHangs = new List<HangObject>();
     }
 
+    public void FixedUpdate()
+    {
+        actualPhase.FixedUpdate();
+    }
+
 
     void Update()
     {

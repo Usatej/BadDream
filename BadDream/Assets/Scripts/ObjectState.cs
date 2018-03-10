@@ -20,4 +20,6 @@ public abstract class ObjectState
     public abstract void HandleInput();
 
     public abstract void Update();
+
+    public abstract void FixedUpdate();
 }
