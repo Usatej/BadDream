@@ -27,17 +27,24 @@ public class PhaseController : MonoBehaviour
     public LayerMask boxLayer;
 
     [HideInInspector]
-    public ObjectAction viableAction;
+    public List<ObjectAction> viableAction;
     [HideInInspector]
     public ObjectAction actualAction = null;
     [HideInInspector]
     public bool inAction = false;
+
+    [HideInInspector]
+    public List<HangObject> viableHangs;
+    [HideInInspector]
+    public HangObject actualHang;
 
 
     void Start()
     {
         CreatePhase(startPhase);
         grounder = GetComponent<Grounder>();
+        viableAction = new List<ObjectAction>();
+        viableHangs = new List<HangObject>();
     }
 
 

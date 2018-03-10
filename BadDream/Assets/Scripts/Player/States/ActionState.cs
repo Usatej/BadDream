@@ -9,7 +9,19 @@ public class ActionState : ObjectState
 
     public ActionState(PhaseController _player) : base(_player)
     {
-        player.actualAction = player.viableAction;
+        float min = Mathf.Infinity;
+        ObjectAction best = player.viableAction[0];
+        foreach(ObjectAction x in player.viableAction)
+        {
+            Vector2 p = player.transform.position;
+            Vector2 o = x.actionObject.transform.position;
+            float tmp = (p.x - o.x)* (p.x - o.x) + (p.y - o.y) * (p.y - o.y);
+            if (tmp < min) {
+                min = tmp;
+                best = x;
+            }
+        }
+        player.actualAction = best;
         Enter();
     }
 

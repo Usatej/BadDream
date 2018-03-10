@@ -12,9 +12,7 @@ public class MoveState : ObjectState
     private Animator anim;
     private Rigidbody2D rb;
 
-    private bool jumped = false;
-    private bool doubleJumped = false;
-    private float fallMultiplier = 2.5f;
+    
 
     private IKController iks;
 
@@ -32,28 +30,21 @@ public class MoveState : ObjectState
 
     public override void Enter()
     {
+        anim.SetBool("grounded", true);
     }
 
     public override void EarlyUpdate()
     {
         if (!player.grounder.IsGrounded())
         {
-            anim.SetBool("grounded", false);
-            anim.SetFloat("vSpeed", -rb.velocity.y);
-            rb.gravityScale = (rb.velocity.y < 0) ? fallMultiplier : 1;
-        }
-        else
-        {
-            anim.SetBool("grounded", true);
-            doubleJumped = jumped = false;
+            player.actualPhase.SendRequestToCreateState(PlayerStates.Air);
         }
     }
 
     public override void HandleInput()
     {
-
         //Movement Horizontal
-        if(joystick.IsThereInput() && player.grounder.IsGrounded())
+        if (joystick.IsThereInput() && player.grounder.IsGrounded())
         {
             float x = joystick.Input.x;
 
@@ -83,15 +74,10 @@ public class MoveState : ObjectState
         //Jumping
         if((touchManager.AreaSwipeUp || Input.GetKeyDown(KeyCode.Space)))
         {
-            bool inAir = !player.grounder.IsGrounded();
-            if (!inAir && !jumped)
+            if (player.grounder.IsGrounded())
             {
-                rb.velocity = new Vector2(rb.velocity.x, attr.jumpForce);
-                jumped = true;
-            } else if(inAir && !doubleJumped)
-            {
-                rb.velocity = new Vector2(rb.velocity.x, attr.jumpForce * attr.doubleJumpMultiplier);
-                doubleJumped = true;
+                rb.velocity = new Vector2(rb.velocity.x, player.attributes.jumpForce);
+                player.actualPhase.SendRequestToCreateState(PlayerStates.Air);
             }
         }
     }
@@ -101,15 +87,15 @@ public class MoveState : ObjectState
         Vector2 handPos = Vector2.zero;
         if(FindPushObject(out handPos) && player.grounder.IsGrounded())
         {
-            iks.rightArmPull.ik.gameObject.SetActive(true);
-            iks.leftArmPull.ik.gameObject.SetActive(true);
-            iks.rightArmPull.ik.transform.position = iks.leftArmPull.ik.transform.position = handPos;
+            iks.rightArm.ik.gameObject.SetActive(true);
+            iks.leftArm.ik.gameObject.SetActive(true);
+            iks.rightArm.ik.transform.position = iks.leftArm.ik.transform.position = handPos;
             anim.SetBool("pulling", true);
             anim.SetFloat("speed", Mathf.Abs(joystick.Input.x) * -1);
         } else
         {
-            iks.rightArmPull.ik.gameObject.SetActive(false);
-            iks.leftArmPull.ik.gameObject.SetActive(false);
+            iks.rightArm.ik.gameObject.SetActive(false);
+            iks.leftArm.ik.gameObject.SetActive(false);
             anim.SetBool("pulling", false);
         }
     }
@@ -117,7 +103,7 @@ public class MoveState : ObjectState
     private bool FindPushObject(out Vector2 pos)
     {
         
-        Vector3 rayStart = iks.rightArmPull.centerPoint.position;
+        Vector3 rayStart = iks.rightArm.centerPoint.position;
         Debug.DrawRay(rayStart, Vector3.right * player.transform.localScale.x);
         RaycastHit2D hit = Physics2D.Raycast(rayStart, Vector3.right * player.transform.localScale.x, 0.7f, player.boxLayer.value);
         if (hit)

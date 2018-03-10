@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BoxController : MonoBehaviour {
+public class BoxController : MonoBehaviour
+{
 
     bool isHere = false;
     PhaseController pc;
+    private BoxAction act;
 
     private void Start()
     {
@@ -14,29 +16,31 @@ public class BoxController : MonoBehaviour {
 
     private void OnTriggerStay2D(Collider2D coll)
     {
-        
+
         if (!isHere && coll.tag == "Hands" && pc.actualAction == null)
         {
-                float xBox = transform.position.x;
-                float xPl = coll.transform.root.position.x;
-                if (Mathf.Sign(coll.transform.root.localScale.x) > 0)
+            float xBox = transform.position.x;
+            float xPl = coll.transform.root.position.x;
+            if (Mathf.Sign(coll.transform.root.localScale.x) > 0)
+            {
+                if (xBox > xPl)
                 {
-                    if (xBox > xPl)
-                    {
-                        isHere = true;
+                    isHere = true;
                     Debug.Log("LoL");
-                       pc.viableAction = new BoxAction(this.gameObject, coll.transform.root.gameObject);
-                    }
+                    act = new BoxAction(this.gameObject, coll.transform.root.gameObject);
+                    pc.viableAction.Add(act);
                 }
-                else
+            }
+            else
+            {
+                if (xPl > xBox)
                 {
-                    if (xPl > xBox)
-                    {
                     Debug.Log("LoL2");
                     isHere = true;
-                        pc.viableAction = new BoxAction(this.gameObject, coll.transform.root.gameObject);
-                    }
+                    act = new BoxAction(this.gameObject, coll.transform.root.gameObject);
+                    pc.viableAction.Add(act);
                 }
+            }
         }
     }
 
@@ -45,7 +49,7 @@ public class BoxController : MonoBehaviour {
         if (isHere && coll.tag == "Player")
         {
             isHere = false;
-            pc.viableAction = null;
+            pc.viableAction.Remove(act);
         }
-    } 
+    }
 }

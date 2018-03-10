@@ -8,7 +8,7 @@ public class Grounder: MonoBehaviour {
     public LayerMask layer; 
     public float offSet;
 
-    public bool grounded = false;
+    private bool grounded = false;
     private bool onMovingObject = false;
     private Vector2 objectVelocity;
 
@@ -27,7 +27,7 @@ public class Grounder: MonoBehaviour {
         Vector2 rayStart;
 
         rayStart = new Vector2(footCollider.bounds.center.x, footCollider.bounds.center.y - footCollider.bounds.size.y/2);
-        
+
         Vector2 size = new Vector2 (footCollider.bounds.size.x + 2*offSet, 2*offSet);
         RaycastHit2D hit = Physics2D.BoxCast(rayStart, size, 0, Vector2.right, 0f,layer.value);
         if (hit)

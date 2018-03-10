@@ -56,6 +56,12 @@ abstract public class Phase
             case PlayerStates.Move:
                 actualState = new MoveState(player);
                 break;
+            case PlayerStates.Air:
+                actualState = new AirState(player);
+                break;
+            case PlayerStates.Hang:
+                actualState = new HangState(player);
+                break;
             case PlayerStates.Action:
                 player.inAction = true;
                 actualState = new ActionState(player);

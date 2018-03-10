@@ -56,8 +56,8 @@ public class BoxAction : ObjectAction
         anim = player.GetComponent<Animator>();
         distanceFromBox = (player.transform.localScale.x > 0) ? -distanceFromBox : distanceFromBox;
         player.transform.position = new Vector3(actionObject.transform.position.x + distanceFromBox, player.transform.position.y, 0);
-        iks.leftArmPull.ik.transform.gameObject.SetActive(true);
-        iks.rightArmPull.ik.transform.gameObject.SetActive(true);
+        iks.leftArm.ik.transform.gameObject.SetActive(true);
+        iks.rightArm.ik.transform.gameObject.SetActive(true);
         anim.SetBool("pulling", true);
         CreateJoint();
         return true;
@@ -68,8 +68,9 @@ public class BoxAction : ObjectAction
         if(joystick.IsThereInput() && grounder.IsGrounded())
         {
             float y = joystick.Input.y;
-            y = (y < 0) ? y*attrs.pushSpeed : -5f + rb.velocity.y;
-            rb.velocity = new Vector2(joystick.Input.x * attrs.pushSpeed, y);
+            float x = joystick.Input.x / Mathf.Abs(joystick.Input.x);
+            //y = (y < 0) ? y*attrs.pushSpeed : -5f + rb.velocity.y;
+            rb.velocity = new Vector2(x * attrs.pushSpeed, rb.velocity.y);
         }
         if(Input.GetKeyDown(KeyCode.O))
         {
@@ -101,9 +102,9 @@ public class BoxAction : ObjectAction
         Bounds bd = handArea.bounds;
         Vector2 x = CalculatePoints(bd.center.x, bd.max.y, bd.center.x, bd.center.y, actionObject.transform.eulerAngles.z);
         Vector2 y = CalculatePoints(bd.center.x, bd.min.y, bd.center.x, bd.center.y, actionObject.transform.eulerAngles.z);
-        Vector2 tmp = new Vector2(iks.rightArmPull.centerPoint.transform.position.x, iks.rightArmPull.centerPoint.transform.position.y);
-        List<IntersectPoint> points = CalculateIntersectPoints(x, y, tmp, iks.rightArmPull.maxDistance);
-        dj.connectedAnchor = player.transform.InverseTransformPoint(iks.rightArmPull.centerPoint.transform.position);
+        Vector2 tmp = new Vector2(iks.rightArm.centerPoint.transform.position.x, iks.rightArm.centerPoint.transform.position.y);
+        List<IntersectPoint> points = CalculateIntersectPoints(x, y, tmp, iks.rightArm.maxDistance);
+        dj.connectedAnchor = player.transform.InverseTransformPoint(iks.rightArm.centerPoint.transform.position);
         HandsIKPosition(points, x, y);
 
 
@@ -176,7 +177,7 @@ public class BoxAction : ObjectAction
         }
         if (inPoints.Count == 1 && PointIsBetweenPoints(botP, topP, inPoints[0].point))
         {
-            anchors = iks.rightArmPull.ik.transform.position = iks.leftArmPull.ik.transform.position = inPoints[0].point;
+            anchors = iks.rightArm.ik.transform.position = iks.leftArm.ik.transform.position = inPoints[0].point;
             return true;
         }
         if (inPoints.Count == 2)
@@ -190,36 +191,36 @@ public class BoxAction : ObjectAction
                 Vector2 handsPos = (handsMid + holderMid)/ 2;
                 if (PointIsBetweenPoints(inPoints[0].point, inPoints[1].point, handsPos))
                 {
-                    anchors = iks.rightArmPull.ik.transform.position = iks.leftArmPull.ik.transform.position = handsPos;
+                    anchors = iks.rightArm.ik.transform.position = iks.leftArm.ik.transform.position = handsPos;
                 }
                 else
                 {
-                    anchors = iks.rightArmPull.ik.transform.position = iks.leftArmPull.ik.transform.position = GetClosestPoint(inPoints[0].point, inPoints[1].point, handsPos);
+                    anchors = iks.rightArm.ik.transform.position = iks.leftArm.ik.transform.position = GetClosestPoint(inPoints[0].point, inPoints[1].point, handsPos);
                 }
             }
             else if (first && !second)
             {
                 Vector2 n = GetClosestPoint(botP, topP, inPoints[1].point);
                 Vector2 holderMid = (inPoints[0].point + n) / 2;
-                anchors = iks.rightArmPull.ik.transform.position = iks.leftArmPull.ik.transform.position = holderMid;
+                anchors = iks.rightArm.ik.transform.position = iks.leftArm.ik.transform.position = holderMid;
 
             }
             else if (!first && second)
             {
                 Vector2 n = GetClosestPoint(botP, topP, inPoints[0].point);
                 Vector2 holderMid = (inPoints[1].point + n) / 2;
-                anchors = iks.rightArmPull.ik.transform.position = iks.leftArmPull.ik.transform.position = holderMid;
+                anchors = iks.rightArm.ik.transform.position = iks.leftArm.ik.transform.position = holderMid;
             } else if(PointIsBetweenPoints(inPoints[0].point,inPoints[1].point,topP) && PointIsBetweenPoints(inPoints[0].point, inPoints[1].point, botP)) {
                 Vector2 handsMid = (inPoints[0].point + inPoints[1].point) / 2;
                 Vector2 holderMid = (botP + topP) / 2;
                 Vector2 handsPos = (handsMid + holderMid) / 2;
                 if (PointIsBetweenPoints(topP, botP, handsPos))
                 {
-                    anchors = iks.rightArmPull.ik.transform.position = iks.leftArmPull.ik.transform.position = handsPos;
+                    anchors = iks.rightArm.ik.transform.position = iks.leftArm.ik.transform.position = handsPos;
                 }
                 else
                 {
-                    anchors = iks.rightArmPull.ik.transform.position = iks.leftArmPull.ik.transform.position = GetClosestPoint(topP,botP, handsPos);
+                    anchors = iks.rightArm.ik.transform.position = iks.leftArm.ik.transform.position = GetClosestPoint(topP,botP, handsPos);
                 }
             }
             else {
@@ -261,8 +262,8 @@ public class BoxAction : ObjectAction
     private void StopHolding()
     {
         player.GetComponent<Animator>().SetBool("pulling", false);
-        iks.leftArmPull.ik.gameObject.SetActive(false);
-        iks.rightArmPull.ik.gameObject.SetActive(false);
+        iks.leftArm.ik.gameObject.SetActive(false);
+        iks.rightArm.ik.gameObject.SetActive(false);
         GameObject.Destroy(dj);
     }
 }

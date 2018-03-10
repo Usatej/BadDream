@@ -4,7 +4,22 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-public class TouchManager: MonoBehaviour {
+public class TouchManager: MonoBehaviour { 
+    
+    public enum TouchTypes
+    {
+        tap = 1,
+        swipeLeft = 2,
+        swipeRight = 4,
+        swipeUp = 8,
+        swipeDown = 16,
+        areaTap = 32,
+        areaSwipeLeft = 64,
+        areaSwipeRight = 128,
+        areaSwipeUp = 256,
+        areaSwipeDown = 512,
+        areaHolding = 1028
+    }
 
     private class TouchInfo
     {
@@ -20,7 +35,7 @@ public class TouchManager: MonoBehaviour {
     Dictionary<int, TouchInfo> actTouches;
 
 
-    bool tap, swipeLeft, swipeRight, swipeUp, swipeDown, areaTap, areaSwipeLeft, areaSwipeRight, areaSwipeUp, areaSwipeDown;
+    bool tap, swipeLeft, swipeRight, swipeUp, swipeDown, areaTap, areaSwipeLeft, areaSwipeRight, areaSwipeUp, areaSwipeDown, areaHolding;
 
     public bool Tap { get { return tap; } }
     public bool SwipeLeft { get { return swipeLeft; } }
@@ -32,8 +47,9 @@ public class TouchManager: MonoBehaviour {
     public bool AreaSwipeRight { get { return areaSwipeRight; } }
     public bool AreaSwipeUp { get { return areaSwipeUp; } }
     public bool AreaSwipeDown { get { return areaSwipeDown; } }
+    public bool AreaHolding { get { return areaHolding; } }
 
-    
+
     void Start () {
         actTouches = new Dictionary<int, TouchInfo>();
     }
@@ -48,6 +64,7 @@ public class TouchManager: MonoBehaviour {
     {       
         foreach (Touch t in Input.touches)
         {
+            if (TestPositionInArea(t.position)) areaHolding = true;
             if (t.phase == TouchPhase.Began)
             {
                 TouchInfo tmp = new TouchInfo();
@@ -93,6 +110,7 @@ public class TouchManager: MonoBehaviour {
                 else swipeDown = areaSwipeDown = true;
             }
             if (!TestPositionInArea(t.start)) areaSwipeLeft = areaSwipeRight = areaSwipeUp = areaSwipeDown = false;
+            else areaHolding = false;
         }
     }
 
@@ -103,6 +121,6 @@ public class TouchManager: MonoBehaviour {
 
     private void ResetManager()
     {
-        tap = swipeLeft = swipeRight = swipeUp = swipeDown = areaTap = areaSwipeLeft = areaSwipeRight = areaSwipeUp = areaSwipeDown = false;
+        tap = swipeLeft = swipeRight = swipeUp = swipeDown = areaTap = areaSwipeLeft = areaSwipeRight = areaSwipeUp = areaSwipeDown = areaHolding = false;
     }
 }

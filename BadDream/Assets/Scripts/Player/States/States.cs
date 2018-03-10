@@ -6,6 +6,8 @@ using UnityEngine;
 public enum PlayerStates
 {
     Move,
+    Air,
+    Hang,
     Swim,
     Action,
 }

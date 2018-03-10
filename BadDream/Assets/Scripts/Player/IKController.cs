@@ -13,8 +13,14 @@ public class IKController : MonoBehaviour {
         public float maxDistance;
     }
 
-    public IKInfo leftArmPull;
-    public IKInfo rightArmPull;
+    public IKInfo leftArm;
+    public IKInfo rightArm;
     public IKInfo leftLeg;
     public IKInfo rightLeg;
+
+    public void DeactivateArmIKs()
+    {
+        leftArm.ik.gameObject.SetActive(false);
+        rightArm.ik.gameObject.SetActive(false);
+    }
 }
