@@ -61,6 +61,8 @@ public class HelpCanvas : MonoBehaviour
     public void ResetInputFields()
     {
         emailField.text = descField.text = "";
+        SetWhiteTextDesc();
+        SetWhiteTextEmail();
         ((Text)emailField.placeholder).text = "Enter your email adress..";
         ((Text)descField.placeholder).text = "Enter description of bug..";
     }
@@ -126,14 +128,14 @@ public class HelpCanvas : MonoBehaviour
         }
     }
 
-    public void SetWhiteTextemail()
+    public void SetWhiteTextEmail()
     {
-        emailField.textComponent.color = Color.white;
+        ((Text)emailField.placeholder).color = Color.white;
     }
 
     public void SetWhiteTextDesc()
     {
-        descField.textComponent.color = Color.white;
+        ((Text)descField.placeholder).color = Color.white;
     }
 
     public void ShowCompleteAnnounce()

@@ -65,8 +65,9 @@ public class GameMaster : MonoBehaviour {
     {
         ActiveMainMenuButtons(false);
         reportCanvas.gameObject.SetActive(true);
-        reportCanvas.GetComponent<HelpCanvas>().ResetInputFields();
-        reportCanvas.GetComponent<HelpCanvas>().mainPanel.gameObject.SetActive(true);
+        HelpCanvas hc = reportCanvas.GetComponent<HelpCanvas>();
+        hc.ResetInputFields();
+        hc.mainPanel.gameObject.SetActive(true);
     }
 
     public void ReportClose ()
