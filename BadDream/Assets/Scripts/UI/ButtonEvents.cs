@@ -9,6 +9,9 @@ public class ButtonEvents : MonoBehaviour, IPointerUpHandler, IPointerDownHandle
 {
     public UnityEvent buttonUnityEvent;
 
+    public bool activ = true;
+    private bool wasDown = false;
+
     public Text text;
     public Color textColor;
 
@@ -26,6 +29,8 @@ public class ButtonEvents : MonoBehaviour, IPointerUpHandler, IPointerDownHandle
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        if (!activ) return;
+        wasDown = true;
         oldColors.Clear();
         oldTextColor = text.color;
         text.color = textColor;
@@ -40,7 +45,8 @@ public class ButtonEvents : MonoBehaviour, IPointerUpHandler, IPointerDownHandle
     }
 
     public void OnPointerUp(PointerEventData eventData)
-    { 
+    {
+        if (!wasDown) return;
         text.color = oldTextColor;
         int i = 0;
         foreach (Transform x in objects)
@@ -49,5 +55,15 @@ public class ButtonEvents : MonoBehaviour, IPointerUpHandler, IPointerDownHandle
             sp.color = oldColors[i];
             i++;
         }
+        if (!activ) return;
+        if (RectTransformUtility.RectangleContainsScreenPoint(GetComponent<RectTransform>(), eventData.position, eventData.pressEventCamera))
+        {
+            buttonUnityEvent.Invoke();
+        }
+    }
+
+    public void SetActive(bool isActive)
+    {
+        activ = isActive;
     }
 }
