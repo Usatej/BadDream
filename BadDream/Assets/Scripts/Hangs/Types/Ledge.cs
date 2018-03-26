@@ -97,11 +97,15 @@ public class Ledge : HangObject
         int plook = (int)Mathf.Sign(player.transform.localScale.x);
         if (look == plook)
         {
-            Vector2 size = new Vector2(0.8f, 0.5f);
+            Vector2 size = new Vector2(0.5f, 0.5f);
             Vector2 rayStart = new Vector2(hangPoint.transform.position.x - look * (0.1f + size.x / 2), hangPoint.transform.position.y);
             DrawBoxCast(rayStart, size, Color.red);
             RaycastHit2D hit = Physics2D.BoxCast(rayStart, size, 0, Vector2.down, 2.5f, layer.value);
-            if (hit) return false;
+            if (hit)
+            {
+                Debug.Log("Hit + " + hit.transform.name);
+                return false;
+            }
             rayStart = new Vector2(hangPoint.transform.position.x + look * (0.1f + size.x / 2), hangPoint.transform.position.y + (0.1f + size.y / 2));
             DrawBoxCast(rayStart, size, Color.red);
             hit = Physics2D.BoxCast(rayStart, size, 0, Vector2.up, 2.3f, layer.value);

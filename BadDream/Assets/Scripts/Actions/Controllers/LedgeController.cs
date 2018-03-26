@@ -6,6 +6,7 @@ public class LedgeController : MonoBehaviour {
 
     private Transform foot;
     private PhaseController pc;
+    
 
     private void Start()
     {

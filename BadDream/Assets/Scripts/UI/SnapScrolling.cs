@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UI;   
 
 public class SnapScrolling : MonoBehaviour {
 
@@ -57,9 +57,10 @@ public class SnapScrolling : MonoBehaviour {
         pansScale = new Vector2[levels.Count];
         for (int i = 0; i < levels.Count; i++)
         {
-            
-            
+
             levelPans[i] = Instantiate(panelPrefab, transform, false);
+            levelPans[i].GetComponent<LevelLoad>().levelName = levels[i].name;
+
             float size = levelPans[i].GetComponentInChildren<RectTransform>().rect.size.x;
             levelPans[i].GetComponentInChildren<Image>().sprite = levels[i].image;
             levelPans[i].GetComponentInChildren<Text>().text = levels[i].name;
@@ -105,5 +106,9 @@ public class SnapScrolling : MonoBehaviour {
     {
         isScrolling = scroll;
         if (scroll) scrollRect.inertia = true;
+    }
+
+    public void OnClickEvent()
+    {
     }
 }

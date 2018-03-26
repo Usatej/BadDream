@@ -119,7 +119,7 @@ public class TouchManager: MonoBehaviour {
         return pos.x >= (Screen.width / 2);
     }
 
-    private void ResetManager()
+    public void ResetManager()
     {
         tap = swipeLeft = swipeRight = swipeUp = swipeDown = areaTap = areaSwipeLeft = areaSwipeRight = areaSwipeUp = areaSwipeDown = areaHolding = false;
     }

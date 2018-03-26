@@ -44,7 +44,7 @@ public class PhaseController : MonoBehaviour
         CreatePhase(startPhase);
         grounder = GetComponent<Grounder>();
         viableAction = new List<ObjectAction>();
-        viableHangs = new List<HangObject>();
+        viableHangs = new List<HangObject>();   
     }
 
     public void FixedUpdate()

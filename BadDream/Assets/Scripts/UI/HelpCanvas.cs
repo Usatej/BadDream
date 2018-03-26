@@ -63,7 +63,7 @@ public class HelpCanvas : MonoBehaviour
         emailField.text = descField.text = "";
         SetWhiteTextDesc();
         SetWhiteTextEmail();
-        ((Text)emailField.placeholder).text = "Enter your email adress..";
+        ((Text)emailField.placeholder).text = "Enter your email address..";
         ((Text)descField.placeholder).text = "Enter description of bug..";
     }
 
@@ -73,7 +73,7 @@ public class HelpCanvas : MonoBehaviour
         if (EmailValidation(emailField.text))
         {
             emailField.text = "";
-            ((Text)emailField.placeholder).text = "Please enter correct email adress!";
+            ((Text)emailField.placeholder).text = "Please enter correct email address!";
             ((Text)emailField.placeholder).color = Color.red;
             error = true;
         }

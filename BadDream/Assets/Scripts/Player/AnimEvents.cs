@@ -34,6 +34,7 @@ public class AnimEvents : MonoBehaviour {
             Vector3 tmp = bp.bones.position;
             pc.transform.position = tmp;
             bp.bones.localPosition = Vector3.zero;
+            anim.SetBool("grounded", true);
             anim.Play("Movement");
             reset = false;
         }

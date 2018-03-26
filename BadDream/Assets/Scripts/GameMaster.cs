@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameMaster : MonoBehaviour {
 
@@ -74,5 +75,15 @@ public class GameMaster : MonoBehaviour {
     {
         ActiveMainMenuButtons(true);
         reportCanvas.gameObject.SetActive(false);
+    }
+
+    public void LoadLevel(string level)
+    {
+        SceneManager.LoadScene(level);
+    }
+
+    public void DebugLog(string log)
+    {
+        Debug.Log(log);
     }
 }
